@@ -25,8 +25,6 @@ fn main() {
         let album = get_album(configuration.file_path).unwrap();
         let result = parse_album(album).unwrap();
         println!("{result}");
-
-
     }
 
 }

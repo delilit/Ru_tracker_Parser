@@ -1,0 +1,1 @@
+A feature, when type of foulder - album or discography can be selected.

@@ -1,5 +1,5 @@
 use crate::models::Album;
-use crate::utils::time_pars;
+use crate::utils::time::*;
 
 pub fn parse_album(album: Album) -> Result<String, &'static str>{
 
