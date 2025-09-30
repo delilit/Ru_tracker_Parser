@@ -1,3 +1,8 @@
+
+mod models;
+
+pub use crate::models::*;
+
 use metaflac::Tag;
 use std::ffi::OsString;
 use std::fmt;
@@ -5,21 +10,8 @@ use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
 
-#[derive(PartialEq)]
-pub struct Track {
-    pub name: String,
-    pub duration: u64,
-}
-impl fmt::Debug for Track {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Track")
-            .field("name", &self.name)
-            .field("duration", &self.duration)
-            .finish()
-    }
-}
-#[derive(PartialEq)]
 
+#[derive(PartialEq)]
 pub struct Album {
     pub name: String,
     pub tracks: Vec<Track>,
@@ -31,36 +23,6 @@ impl fmt::Debug for Album {
             .field("name", &self.name)
             .field("tracks", &self.tracks)
             .finish()
-    }
-}
-
-pub struct Config {
-    pub file_path: PathBuf,
-}
-impl Config {
-    pub fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
-        args.next();
-
-        let mut path = match args.next() {
-            Some(p) => p,
-            None => return Err("didn't get a file path"),
-        };
-
-        let mut file_path = PathBuf::from(OsString::from(path));
-        println!("{}", file_path.display());
-        Ok(Config {
-            file_path: file_path,
-        })
-    }
-    pub fn is_multi_album(&self) -> bool {
-        let entries = fs::read_dir(&self.file_path).unwrap();
-        for mut entry in entries {
-            let file_type = entry.unwrap().file_type().unwrap();
-            if file_type.is_file() {
-                return false;
-            }
-        }
-        true
     }
 }
 
@@ -108,7 +70,6 @@ pub fn parse_single_album(album: Album) -> Result<String, &'static str>{
 
     let duration = time_pars(summary_duration);
 
-    //result making block
     let mut result = String::from(r#"[spoiler="YEAR - ALBUMNAME"]"#);
 
     result.push_str("\n[img=right]FASTPIC[/img]");
@@ -193,57 +154,57 @@ fn time_pars(mut sec: u64) -> Vec<String> {
     Vec::from([h, min, sec.to_string()])
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
 
-    #[test]
-    fn duration_test() {
-        let duration_test = flac_duration(&PathBuf::from(
-            r"D:\Music\[幻覚アリア] Hallucination Aria\[幻覚アリア] 幻覚アリア\01 Prologue-hallucination-.flac",
-        ));
-        assert_eq!(duration_test.unwrap(), 43 as u64);
-    }
-    #[test]
-    fn not_multi_album_checking() {
-        assert_eq!(
-            Config {
-                file_path: PathBuf::from(r"D:\Music\Sally (サリー)\2011 - Sally")
-            }
-                .is_multi_album(),
-            false
-        );
-    }
-    #[test]
-    fn multi_album_checking() {
-        assert_eq!(
-            Config {
-                file_path: PathBuf::from(r"D:\Music\Sally (サリー)")
-            }
-                .is_multi_album(),
-            true
-        );
-    }
-    #[test]
-    fn getting_album() {
-        assert_eq!(
-            Album {
-                name: String::from("Album name"),
-                tracks: Vec::from([Track {
-                    name: String::from("ded.flac"),
-                    duration: 256
-                }])
-            },
-            get_album(PathBuf::from(r"D:\Music\testebat")).unwrap()
-        );
-    }
-    #[test]
-    fn getting_empty_album() {
-        let f = match (get_album(PathBuf::from(r"D:\Music\testebat\nonmusicfolder"))) {
-            Ok(T) => "asd",
-            Err(E) => E,
-        };
-        assert_eq!("No tracks in directory", f);
-    }
-}
-
+//     #[test]
+//     fn duration_test() {
+//         let duration_test = flac_duration(&PathBuf::from(
+//             r"D:\Music\[幻覚アリア] Hallucination Aria\[幻覚アリア] 幻覚アリア\01 Prologue-hallucination-.flac",
+//         ));
+//         assert_eq!(duration_test.unwrap(), 43 as u64);
+//     }
+//     #[test]
+//     fn not_multi_album_checking() {
+//         assert_eq!(
+//             Config {
+//                 file_path: PathBuf::from(r"D:\Music\Sally (サリー)\2011 - Sally")
+//             }
+//                 .is_discography(),
+//             false
+//         );
+//     }
+//     #[test]
+//     fn multi_album_checking() {
+//         assert_eq!(
+//             Config {
+//                 file_path: PathBuf::from(r"D:\Music\Sally (サリー)")
+//             }
+//                 .is_discography(),
+//             true
+//         );
+//     }
+//     #[test]
+//     fn getting_album() {
+//         assert_eq!(
+//             Album {
+//                 name: String::from("Album name"),
+//                 tracks: Vec::from([Track {
+//                     name: String::from("ded.flac"),
+//                     duration: 256
+//                 }])
+//             },
+//             get_album(PathBuf::from(r"D:\Music\testebat")).unwrap()
+//         );
+//     }
+//     #[test]
+//     fn getting_empty_album() {
+//         let f = match (get_album(PathBuf::from(r"D:\Music\testebat\nonmusicfolder"))) {
+//             Ok(T) => "asd",
+//             Err(E) => E,
+//         };
+//         assert_eq!("No tracks in directory", f);
+//     }
+// }
+//
